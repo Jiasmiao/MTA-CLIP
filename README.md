@@ -37,7 +37,7 @@ Given the patch-token feature map from the last Transformer layer, SGA:
 - Use a cross-modal contrastive objective (coarse-grained alignment):
 
 
-$$L_stage1 = sum_{k=1..K} L_con(D_k)$$
+$$L_{stage1} = \sum_{k=1}^{K} L_{con}(D_k)$$
 
 
 ### Stage 2: Multi-task fine-tuning (enable SGA)
@@ -47,7 +47,7 @@ $$L_stage1 = sum_{k=1..K} L_con(D_k)$$
 - Jointly optimize identity discrimination + cross-modal consistency:
 
 $$
-L_total(D_k) = L_id(D_k) + lambda_1 * L_tri(D_k) + lambda_2 * L_i2t(D_k)
+L_{total}(D_k) = L_{id}(D_k) + \lambda_{1} \cdot L_{tri}(D_k) + \lambda_{2} \cdot L_{i2t}(D_k)
 $$
 
 ---
