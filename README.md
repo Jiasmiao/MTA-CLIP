@@ -1,87 +1,77 @@
-# MTA-CLIP (Multi-Task Adaptive CLIP for Person Re-Identification)
+# MTA-CLIP: Multi-Task Adaptive CLIP for Person Re-Identification
 
-This repository provides an implementation of **MTA-CLIP**, proposed in our paper:
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![PyTorch](https://img.shields.io/badge/PyTorch-v1.10+-red.svg)
 
-> **Multi-Task Adaptive CLIP for Enhanced Person Re-Identification Across Domains (MTA-CLIP)**
-
-MTA-CLIP adapts a pretrained CLIP backbone to person re-identification with:
-
-- **HCP** (Hierarchical Context Prompting) for shared + domain-specific semantics, and
-- **SGA** (Semantic Grouping Adapter), a lightweight visual adaptation module for fine-grained identity cues.
+**Official implementation** of the paper:
+> **Multi-Task Adaptive CLIP for Enhanced Person Re-Identification Across Domains**
+> *Submitted to The Visual Computer*
 
 ---
+
+## 📅 Release Plan & Data Availability (Important)
+**Current Status:** Project documentation and framework structure are initialized.
+**Code Release:** This project constitutes a core part of the **second author's ongoing graduation thesis**. Due to institutional regulations regarding thesis originality and intellectual property, the full source code (`.py` files) and pre-trained models will be **open-sourced immediately upon the completion of the graduation thesis defense**.
+**Datasets:** The Market-1501 and MSMT17 datasets used in this paper are publicly available from their respective authors.
+
+---
+
+## MTA-CLIP (Multi-Task Adaptive CLIP for Person Re-Identification)
+
+This repository provides an implementation of **MTA-CLIP**, proposed in our paper:
+**Multi-Task Adaptive CLIP for Enhanced Person Re-Identification Across Domains (MTA-CLIP)**
+
+MTA-CLIP adapts a pretrained CLIP backbone to person re-identification with:
+* **HCP (Hierarchical Context Prompting)** for shared + domain-specific semantics, and
+* **SGA (Semantic Grouping Adapter)**, a lightweight visual adaptation module for fine-grained identity cues.
 
 ## SGA (Semantic Grouping Adapter)
 
 SGA is plugged into the visual branch (ViT-based image encoder) during fine-tuning.
-
 Given the patch-token feature map from the last Transformer layer, SGA:
-
-- splits channels into multiple semantic groups,
-- performs group-wise lightweight transformations / reweighting,
-- integrates a global context branch,
-- fuses the two streams via learnable softmax weights,
-- outputs an enhanced feature map through a residual connection.
-
----
+* splits channels into multiple semantic groups,
+* performs group-wise lightweight transformations / reweighting,
+* integrates a global context branch,
+* fuses the two streams via learnable softmax weights,
+* outputs an enhanced feature map through a residual connection.
 
 ## Training strategy: Progressive Two-Stage Optimization (PTSO)
 
 ### Stage 1: Semantic alignment (prompt learning only)
-
-- Freeze **image encoder** and **text encoder**.
-- **SGA is not trained / not activated**.
-- Optimize **HCP** to decouple
-  - shared prompts: $P_S$
-  - domain-specific prompts: $P_{D_k}$
-- Use a cross-modal contrastive objective (coarse-grained alignment):
-
-
-$$L_{stage1} = \sum_{k=1}^{K} L_{con}(D_k)$$
-
+* Freeze **image encoder** and **text encoder**.
+* **SGA is not trained / not activated**.
+* Optimize **HCP** to decouple:
+    * shared prompts: $P_S$
+    * domain-specific prompts: $P_{D_k}$
+* Use a cross-modal contrastive objective (coarse-grained alignment):
+    $$L_{stage1} = \sum_{k=1}^{K} L_{con}(D_k)$$
 
 ### Stage 2: Multi-task fine-tuning (enable SGA)
-
-- Initialize from Stage 1.
-- Enable **SGA** and partially unfreeze the visual branch.
-- Jointly optimize identity discrimination + cross-modal consistency:
-
-$$
-L_{total}(D_k) = L_{id}(D_k) + \lambda_{1} \cdot L_{tri}(D_k) + \lambda_{2} \cdot L_{i2t}(D_k)
-$$
-
----
+* Initialize from Stage 1.
+* Enable **SGA** and partially unfreeze the visual branch.
+* Jointly optimize identity discrimination + cross-modal consistency:
+    $$L_{total}(D_k) = L_{id}(D_k) + \lambda_{1} \cdot L_{tri}(D_k) + \lambda_{2} \cdot L_{i2t}(D_k)$$
 
 ## Where is SGA in the code?
 
 SGA is implemented and used in the model code under:
+* `model/` (visual backbone / adapters)
 
-- `model/` (visual backbone / adapters)
+**Training scripts** (naming may vary by experiment setting):
+* `train_clipreid_sga_multitask.py` (multi-task training)
+* `train_clipreid_sga.py` (single setting)
+* `train_clipreid.py` (baseline / other configs)
 
-Training scripts (naming may vary by experiment setting):
-
-- `train_clipreid_sga_multitask.py` (multi-task training)
-- `train_clipreid_sga.py` (single setting)
-- `train_clipreid.py` (baseline / other configs)
-
-Visualization utilities used in the paper:
-
-- Extract real features (cached to `./fig/features/`):
-  - `extract_real_features.py`
-- t-SNE method comparison (Baseline vs Ours):
-  - `draw_method_comparison.py`
-
----
+**Visualization utilities** used in the paper:
+* Extract real features (cached to `./fig/features/`): `extract_real_features.py`
+* t-SNE method comparison (Baseline vs Ours): `draw_method_comparison.py`
 
 ## Expected effect
 
 Qualitatively (t-SNE / activation maps):
-
-- more compact intra-class clusters
-- clearer inter-class separation
-- stronger activation on identity-relevant regions
-
----
+* more compact intra-class clusters
+* clearer inter-class separation
+* stronger activation on identity-relevant regions
 
 ## Acknowledgements
 
