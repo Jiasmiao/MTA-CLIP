@@ -64,8 +64,8 @@ SGA is implemented and used in the model code under:
 
 - `model/` (visual backbone / adapters)
 - training scripts:
-  - `train_clipreid_afem_multitask.py`
-  - `train_clipreid_afem.py`
+  - `train_clipreid_sga_multitask.py`
+  - `train_clipreid_sga.py`
   - `train_clipreid.py`
 
 If you are looking for **visualization utilities** used in the paper:
