@@ -27,23 +27,18 @@ Given the patch-token feature map from the last Transformer layer, SGA:
 
 ## Training strategy: Progressive Two-Stage Optimization (PTSO)
 
-> About math rendering in Markdown:
-> Some Markdown previewers (including VS Code built-in preview) may NOT render LaTeX (e.g., `\mathcal{L}`) even if GitHub does.
-> To make this README readable everywhere, we present block equations as plain code blocks.
-> If you want GitHub-style LaTeX rendering, keep equations in `$...$` / `$$...$$` and view on GitHub.
-
 ### Stage 1: Semantic alignment (prompt learning only)
 
 - Freeze **image encoder** and **text encoder**.
 - **SGA is not trained / not activated**.
 - Optimize **HCP** to decouple
-  - shared prompts: P_S
-  - domain-specific prompts: P_{D_k}
+  - shared prompts: $P_S$
+  - domain-specific prompts: $P_{D_k}$
 - Use a cross-modal contrastive objective (coarse-grained alignment):
 
-```text
-L_stage1 = sum_{k=1..K} L_con(D_k)
-```
+
+$$L_stage1 = sum_{k=1..K} L_con(D_k)$$
+
 
 ### Stage 2: Multi-task fine-tuning (enable SGA)
 
@@ -51,11 +46,9 @@ L_stage1 = sum_{k=1..K} L_con(D_k)
 - Enable **SGA** and partially unfreeze the visual branch.
 - Jointly optimize identity discrimination + cross-modal consistency:
 
-```text
+$$
 L_total(D_k) = L_id(D_k) + lambda_1 * L_tri(D_k) + lambda_2 * L_i2t(D_k)
-```
-
-> Note: In our diagrams/captions, Stage 1 may use `L_con` (symmetric), while Stage 2 highlights `L_i2t` to emphasize the image-to-text direction used for maintaining alignment during fine-tuning.
+$$
 
 ---
 
@@ -67,8 +60,8 @@ SGA is implemented and used in the model code under:
 
 Training scripts (naming may vary by experiment setting):
 
-- `train_clipreid_afem_multitask.py` (multi-task training)
-- `train_clipreid_afem.py` (single setting)
+- `train_clipreid_sga_multitask.py` (multi-task training)
+- `train_clipreid_sga.py` (single setting)
 - `train_clipreid.py` (baseline / other configs)
 
 Visualization utilities used in the paper:
