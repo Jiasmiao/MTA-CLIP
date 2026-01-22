@@ -27,18 +27,23 @@ Given the patch-token feature map from the last Transformer layer, SGA:
 
 ## Training strategy: Progressive Two-Stage Optimization (PTSO)
 
+> About math rendering in Markdown:
+> Some Markdown previewers (including VS Code built-in preview) may NOT render LaTeX (e.g., `\mathcal{L}`) even if GitHub does.
+> To make this README readable everywhere, we present block equations as plain code blocks.
+> If you want GitHub-style LaTeX rendering, keep equations in `$...$` / `$$...$$` and view on GitHub.
+
 ### Stage 1: Semantic alignment (prompt learning only)
 
 - Freeze **image encoder** and **text encoder**.
 - **SGA is not trained / not activated**.
 - Optimize **HCP** to decouple
-  - shared prompts $\mathbf{P}_S$
-  - domain-specific prompts $\mathbf{P}_{D_k}$
+  - shared prompts: P_S
+  - domain-specific prompts: P_{D_k}
 - Use a cross-modal contrastive objective (coarse-grained alignment):
 
-$$
-\mathcal{L}_{stage1} = \sum_{k=1}^{K} \mathcal{L}_{con}(\mathcal{D}_k)
-$$
+```text
+L_stage1 = sum_{k=1..K} L_con(D_k)
+```
 
 ### Stage 2: Multi-task fine-tuning (enable SGA)
 
@@ -46,14 +51,11 @@ $$
 - Enable **SGA** and partially unfreeze the visual branch.
 - Jointly optimize identity discrimination + cross-modal consistency:
 
-$$
-\mathcal{L}_{total}(\mathcal{D}_k) =
-\mathcal{L}_{id}(\mathcal{D}_k)
-+ \lambda_1 \mathcal{L}_{tri}(\mathcal{D}_k)
-+ \lambda_2 \mathcal{L}_{i2t}(\mathcal{D}_k)
-$$
+```text
+L_total(D_k) = L_id(D_k) + lambda_1 * L_tri(D_k) + lambda_2 * L_i2t(D_k)
+```
 
-> Note: In our diagrams/captions, Stage 1 may use $\mathcal{L}_{con}$ (symmetric), while Stage 2 highlights $\mathcal{L}_{i2t}$ to emphasize the image-to-text direction used for maintaining alignment during fine-tuning.
+> Note: In our diagrams/captions, Stage 1 may use `L_con` (symmetric), while Stage 2 highlights `L_i2t` to emphasize the image-to-text direction used for maintaining alignment during fine-tuning.
 
 ---
 
